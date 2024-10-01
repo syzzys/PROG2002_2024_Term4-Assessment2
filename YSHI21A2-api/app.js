@@ -7,7 +7,7 @@ const connection = getMysqlConnection()
 
 app.get('/activeFundraisers', (req, res) => {
   connection.execute(
-    'SELECT * FROM fundraiser WHERE active=True',
+    'SELECT * FROM fundraiser LEFT JOIN category ON fundraiser.CATEGORY_ID = category.CATEGORY_ID WHERE active=True',
     function (err, results, fields) {
       if (err) console.log(err)
       res.json(results)
@@ -21,10 +21,11 @@ app.get('/searchFundraisers', (req, res) => {
   connection.execute(
     `
     SELECT * FROM fundraiser 
+    LEFT JOIN category ON fundraiser.CATEGORY_ID = category.CATEGORY_ID
     WHERE active=True 
     ${ ORGANIZER ? ` AND ORGANIZER = "${ORGANIZER}"` : '' } 
     ${ CITY ? ` AND CITY = "${CITY}"` : '' } 
-    ${ CATEGORY_ID ? ` AND CATEGORY_ID = "${CATEGORY_ID}"` : '' }
+    ${ CATEGORY_ID ? ` AND category.CATEGORY_ID = "${CATEGORY_ID}"` : '' }
   `,
     function (err, results, fields) {
       if (err) console.log(err)
@@ -45,7 +46,7 @@ app.get('/categories', (req, res) => {
 
 app.get('/fundraisers/:id', (req, res) => {
   connection.execute(
-    'SELECT * FROM fundraiser WHERE FUNDRAISER_ID = ?',
+    'SELECT * FROM fundraiser LEFT JOIN category ON fundraiser.CATEGORY_ID = category.CATEGORY_ID WHERE FUNDRAISER_ID = ?',
     [req.params.id],
     function (err, results, fields) {
       if (err) console.log(err)
