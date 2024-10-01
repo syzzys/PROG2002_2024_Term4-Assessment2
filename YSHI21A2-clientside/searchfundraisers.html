@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>searchfundraisers</title>
+    <style>
+        body {
+            min-height: 100vh;
+            display: flex;
+            margin: 0;
+            padding: 0;
+        }
+        .navbar {
+            width: 250px;
+            background-color: #5281f8;
+            color: white;
+            padding: 15px;
+        }
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            display: block;
+            padding: 10px;
+        }
+        .navbar a:hover {
+            background-color: #103ebd;
+        }
+        .content {
+            flex: 1;
+            padding: 20px;
+        }
+        .err {
+            color: #d5090f;
+            font-weight: bolder;
+            font-size: 21px;
+        }
+        .list {
+            display: flex;
+            flex-wrap: wrap;
+            margin-top: 40px;
+        }
+        .list-item {
+            box-shadow: 0 0 10px 2px rgba(0, 0, 0, 0.2);
+            padding: 13px;
+            width: 45%;
+            margin-bottom: 20px;
+        }
+        .list-item:nth-child(2n) {
+            margin-left: 20px;
+        }
+
+        .form label {
+            display: inline-block;
+            width: 104px;
+            text-align: right;
+        }
+    </style>
+</head>
+<body>
+
+<div class="navbar">
+    <h2>Mercy Relief</h2>
+    <a href="./homepage.html">Home</a>
+    <a href="./searchfundraisers.html">Search fundraisers</a>
+    <a href="./fundraisers.html">Fundraisers</a>
+</div>
+
+<div class="content">
+    <h2>Search Fundraisers</h2>
+
+    <div class="form">
+        <label>ORGANIZER: </label>
+        <input id="ORGANIZER" /> <br /><br />
+        <label>CITY: </label>
+        <input id="CITY" /> <br /><br />
+        <label>CATEGORY: </label>
+        <select id="category_select">
+            <option value="">All</option>
+        </select> <br /><br />
+        <button id="search">Search</button>
+        <button id="clear">Clear</button>
+    </div>
+
+    <div id="fundraisers" class="list">
+
+    </div>
+</div>
+
+<script>
+  const categorySelect = document.getElementById("category_select")
+  const clear = document.getElementById("clear")
+  const search = document.getElementById("search")
+  const ORGANIZER = document.getElementById("ORGANIZER")
+  const CITY = document.getElementById("CITY")
+
+  function clearChechboxes() {
+    categorySelect.value = "";
+    ORGANIZER.value = "";
+    CITY.value = "";
+    fundraisers.innerHTML = ""
+  }
+
+  document.addEventListener("DOMContentLoaded", function() {
+    fetch("http://localhost:3000/categories")
+      .then(response => response.json())
+      .then(result => {
+
+        for (let i=0;i<result.length;i++) {
+          let category = result[i]
+          let categoryOptionHTML = `
+            <option value="${category.CATEGORY_ID}">${category.NAME}</option>
+          `
+          categorySelect.innerHTML += categoryOptionHTML
+        }
+      })
+
+    search.addEventListener("click", function() {
+      if (!ORGANIZER.value && !CITY.value && !categorySelect.value) {
+        alert("You should enter at least one search criteria!")
+        return
+      }
+
+      fetch(`http://localhost:3000/searchFundraisers?ORGANIZER=${ORGANIZER.value}&CITY=${CITY.value}&CATEGORY_ID=${categorySelect.value}`)
+        .then(response => response.json())
+        .then(result => {
+          fundraisers.innerHTML = ""
+
+          if (result.length === 0) {
+            fundraisers.innerHTML = "<div class='err'>No fundraisers are found</div>"
+            return
+          }
+
+          for (let i=0;i<result.length;i++) {
+            let fundraiser = result[i]
+            let fundraiserHTML = `
+            <div class="list-item">
+                ID: ${fundraiser.FUNDRAISER_ID}<br/>
+                Organiser:  ${fundraiser.ORGANIZER}<br/>
+                Caption:  ${fundraiser.CAPTION}<br/>
+                Target funding:  ${fundraiser.TARGET_FUNDING}<br/>
+                Current funding:  ${fundraiser.CURRENT_FUNDING}<br/>
+                City:  ${fundraiser.CITY}<br/>
+                Active:  ${fundraiser.ACTIVE === 1 ? 'Active' : 'Suspended'}<br/>
+                Category:  ${fundraiser.NAME}<br/>
+                <button style="margin-top: 10px">View Detail</button>
+            </div>
+          `
+            fundraisers.innerHTML += fundraiserHTML
+          }
+        })
+    })
+
+
+    clear.addEventListener("click", clearChechboxes)
+  })
+</script>
+</body>
+</html>
+
