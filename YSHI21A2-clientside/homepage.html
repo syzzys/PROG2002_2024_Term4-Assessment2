@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>homepage</title>
+    <style>
+        body {
+            min-height: 100vh;
+            display: flex;
+            margin: 0;
+            padding: 0;
+        }
+        .navbar {
+            width: 250px;
+            background-color: #5281f8;
+            color: white;
+            padding: 15px;
+        }
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            display: block;
+            padding: 10px;
+        }
+        .navbar a:hover {
+            background-color: #103ebd;
+        }
+        .content {
+            flex: 1;
+            padding: 20px;
+        }
+        .list {
+            display: flex;
+            flex-wrap: wrap;
+            margin-top: 40px;
+        }
+        .list-item {
+            box-shadow: 0 0 10px 2px rgba(0, 0, 0, 0.2);
+            padding: 13px;
+            width: 45%;
+            margin-bottom: 20px;
+        }
+        .list-item:nth-child(2n) {
+            margin-left: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="navbar">
+    <h2>Mercy Relief</h2>
+    <a href="./homepage.html">Home</a>
+    <a href="./searchfundraisers.html">Search fundraisers</a>
+    <a href="./fundraisers.html">Fundraisers</a>
+</div>
+
+<div class="content">
+    <h2>Mercy Relief</h2>
+    <p>
+        When disaster strikes, it is easy to see those affected as victims: desolate, destitute, and defeated. Here at Mercy Relief, we see things differently. We see people coming together to help one another, fight back, and protect their way of life. We witness their indomitable spirit, and are committed to supporting it.
+    </p>
+    <p>
+        At Mercy Relief, accountability and transparency are fundamental to our work. We believe in open dialogue between beneficiaries, local partners, and stakeholders, like you. These curated reports, highlight the value of your contribution and prove your impact on the ground while showcasing the stories of strength and resilience of the survivors we meet.
+    </p>
+
+    <div id="fundraisers" class="list">
+
+    </div>
+</div>
+
+<script>
+    const fundraisers = document.getElementById("fundraisers")
+
+    document.addEventListener("DOMContentLoaded", function() {
+      fetch("http://localhost:3000/activeFundraisers")
+        .then(response => response.json())
+        .then(result => {
+          fundraisers.innerHTML = ""
+
+          for (let i=0;i<result.length;i++) {
+            let fundraiser = result[i]
+            let fundraiserHTML = `
+            <div class="list-item">
+                ID: ${fundraiser.FUNDRAISER_ID}<br/>
+                Organiser:  ${fundraiser.ORGANIZER}<br/>
+                Caption:  ${fundraiser.CAPTION}<br/>
+                Target funding:  ${fundraiser.TARGET_FUNDING}<br/>
+                Current funding:  ${fundraiser.CURRENT_FUNDING}<br/>
+                City:  ${fundraiser.CITY}<br/>
+                Active:  ${fundraiser.ACTIVE === 1 ? 'Active' : 'Suspended'}<br/>
+                Category:  ${fundraiser.NAME}<br/>
+                <button style="margin-top: 10px">View Detail</button>
+            </div>
+          `
+            fundraisers.innerHTML += fundraiserHTML
+          }
+        })
+    })
+</script>
+</body>
+</html>
+
