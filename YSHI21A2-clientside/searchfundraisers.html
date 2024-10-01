@@ -143,7 +143,7 @@
                 City:  ${fundraiser.CITY}<br/>
                 Active:  ${fundraiser.ACTIVE === 1 ? 'Active' : 'Suspended'}<br/>
                 Category:  ${fundraiser.NAME}<br/>
-                <button style="margin-top: 10px">View Detail</button>
+                <a style="margin-top: 10px" href="./fundraisers.html?id=${fundraiser.FUNDRAISER_ID}">View Detail</a>
             </div>
           `
             fundraisers.innerHTML += fundraiserHTML
